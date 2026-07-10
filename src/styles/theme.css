@@ -128,6 +128,9 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Noto Sans KR(한글) + Nunito(영문/숫자 라운드체) — fonts.css에서 로드, 둘 다 OFL 무료 라이선스.
+    Nunito를 앞에 두면 영문·숫자는 Nunito, 한글은 Noto Sans KR로 자동 폴백된다. */
+    font-family: 'Nunito', 'Noto Sans KR', sans-serif;
   }
 
   /**

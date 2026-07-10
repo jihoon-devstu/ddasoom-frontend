@@ -1,3 +1,4 @@
+import { Heart, Users } from 'lucide-react';
 import { AnimalPreviewSection } from '@/features/animals/components/AnimalPreviewSection';
 import { ContentPreviewSection } from '@/features/board/components/ContentPreviewSection';
 import type { AnimalPreview } from '@/features/animals/types';
@@ -16,10 +17,10 @@ import type { PostPreview } from '@/features/board/types';
 // V101__seed_animal.sql 기준 — 활성(deleted_at NULL) + 이미지 보유 4건을 시드 값 그대로 사용.
 // API 연동 시 이 상수를 useQuery 결과로 교체하면 됩니다(파일 상단 ⭐ 주석 참고).
 const MOCK_ANIMALS: AnimalPreview[] = [
-    { animalId: 1, abandonmentId: '413587202600162', kind: 'D', nickname: '뭉치', gender: 'M', typeName: '말티즈', age: '2024', location: '서울특별시 강남구', likeCount: 2, isFostered: false, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607081107865.jpg' },
-  { animalId: 3, abandonmentId: '450650202601690', kind: 'D', nickname: '초코', gender: 'F', typeName: '믹스견', age: '2022', location: '부산광역시 해운대구', likeCount: 1, isFostered: true, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607082107857.jpeg' },
-  { animalId: 7, abandonmentId: '448567202601027', kind: 'D', nickname: '대박이', gender: 'M', typeName: '진돗개', age: '2018', location: '전라남도 여수시', likeCount: 3, isFostered: false, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607081607515.jpg' },
-  { animalId: 5, abandonmentId: '448567202601029', kind: 'D', nickname: '콩이', gender: 'Q', typeName: '푸들', age: '2026(년생) 추정 2개월', location: '대구광역시 수성구', likeCount: 0, isFostered: false, imageUrl: null },
+    { animalId: 1, abandonmentId: '413587202600162', kind: 'D', nickname: '뭉치', gender: 'M', typeName: '말티즈', age: '2024년생', location: '서울특별시 강남구', likeCount: 2, isFostered: false, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607081107865.jpg' },
+  { animalId: 3, abandonmentId: '450650202601690', kind: 'D', nickname: '초코', gender: 'F', typeName: '믹스견', age: '2022년생', location: '부산광역시 해운대구', likeCount: 1, isFostered: true, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607082107857.jpeg' },
+  { animalId: 7, abandonmentId: '448567202601027', kind: 'D', nickname: '대박이', gender: 'M', typeName: '진돗개', age: '2018년생', location: '전라남도 여수시', likeCount: 3, isFostered: false, imageUrl: 'http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2026/07/202607081607515.jpg' },
+  { animalId: 5, abandonmentId: '448567202601029', kind: 'D', nickname: '콩이', gender: 'Q', typeName: '푸들', age: '2026년생 추정 2개월', location: '대구광역시 수성구', likeCount: 0, isFostered: false, imageUrl: null },
 ];
 
 const MOCK_REVIEWS: PostPreview[] = [
@@ -38,7 +39,7 @@ export function MainPage() {
   return (
     <>
       {/* ── 히어로 ── */}
-      <section className="relative h-[420px] overflow-hidden md:h-[520px]">
+      <section className="relative h-[52vh] min-h-[420px] overflow-hidden md:min-h-[520px]">
         <img
           src="https://images.unsplash.com/photo-1724024056572-0dead0189caf?fm=jpg&w=1400"
           alt="창가에서 쉬고 있는 고양이"
@@ -48,32 +49,56 @@ export function MainPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="mx-auto w-full max-w-6xl px-6">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-accent">새로운 인연의 시작</p>
-            <h1 className="mb-3 text-3xl font-bold leading-snug text-white md:text-[2.6rem]">
+            <p className="mb-3 text-base font-semibold uppercase tracking-[0.2em] text-accent">새로운 인연의 시작</p>
+            <h1 className="mb-3 text-3xl font-bold leading-snug text-white md:text-5xl">
               새로운 가족을 기다리는<br />아이들을 만나보세요
             </h1>
-            <p className="max-w-md text-base leading-relaxed text-[#EED9B6]">
+            <p className="max-w-md text-lg leading-relaxed text-[#EED9B6]">
               전국 각지의 유기동물 보호소에서 새 가족을 기다리는<br />소중한 생명들과 함께하세요.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── 미리보기 3종 — 목업 주입 (API 연동 방법은 상단 ⭐ 주석) ── */}
+            {/* ── 미리보기 3종 — 목업 주입 (API 연동 방법은 상단 ⭐ 주석) ── */}
       <AnimalPreviewSection animals={MOCK_ANIMALS} />
       <ContentPreviewSection
-        title="따뜻한 입양 후기"
-        description="새 가족을 만난 아이들의 행복한 이야기예요."
+        icon={Heart}
+        title="입양 후기"
         posts={MOCK_REVIEWS}
+        moreLabel="후기 더 보기"
         listPath="/board?category=review"
       />
       <ContentPreviewSection
-        title="펫 커뮤니티"
-        description="반려동물과 함께하는 일상과 정보를 나눠요."
+        icon={Users}
+        title="커뮤니티"
         posts={MOCK_COMMUNITY}
+        moreLabel="게시글 더 보기"
         listPath="/board"
         background="cream"
       />
+
+      {/* ── CTA 배너 — 피그마 원형: "입양 후기를 나눠주세요" + 후기 작성하기 ── */}
+      <section className="bg-primary py-16">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-4 md:flex-row">
+          <div>
+            <h2 className="mb-3 text-3xl font-bold text-foreground md:text-4xl">입양 후기를 나눠주세요</h2>
+            <p className="max-w-lg text-lg leading-relaxed text-foreground/70">
+              소중한 입양 경험을 공유해주세요.<br />
+              여러분의 이야기가 다른 아이들에게 새 가족을 만들어 줄 수 있어요.
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-3">
+            {/* TODO(board 담당): 후기 작성 라우트 확정 시 이동 경로 연결 (현재 목록으로) */}
+            <button
+              onClick={() => (window.location.href = '/board?category=review')}
+              className="rounded-full bg-ring px-8 py-3 text-base font-bold text-white transition-all hover:brightness-95"
+            >
+              후기 작성하기
+            </button>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
