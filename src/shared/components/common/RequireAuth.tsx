@@ -1,5 +1,6 @@
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/shared/stores/authStore';
+
 
 // USER 권한 가드(foster/apply, mypage 등 로그인 필요 경로).
 // isAuthReady 이전에는 판단 금지 → 부트스트랩 완료 전에는 스피너만 노출(새로고침 시 튕김 방지).
@@ -14,9 +15,10 @@ export function RequireAuth() {
     );
   }
 
-  // TODO(백엔드 로그인/reissue API 확정 후): 비로그인 시 <Navigate to="/login" replace /> 로 리다이렉트.
-  //   const user = useAuthStore.getState().user;
-  //   if (!user) return <Navigate to="/login" replace />;
-  // 지금은 가드 자리(+스피너)만 만들고 실제 리다이렉트는 보류.
+  const user = useAuthStore((s) => s.user);
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   return <Outlet />;
 }
