@@ -107,7 +107,7 @@ export function LoginPage() {
       </form>
 
       <div className="mt-4 flex items-center justify-between text-sm">
-        <Link to="/reset-password/request" className="text-muted-foreground transition-colors hover:text-ring">
+        <Link to="/reset-password" className="text-muted-foreground transition-colors hover:text-ring">
           비밀번호를 잊으셨나요?
         </Link>
         <Link to="/signup" className="font-semibold text-ring transition-colors hover:brightness-110">
