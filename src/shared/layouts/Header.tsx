@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PawPrint } from 'lucide-react';
+import { PawPrint, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/shared/stores/authStore';
 import { logout } from '@/features/auth/api/authApi';
@@ -10,6 +10,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/shared/components/ui/alert-dialog';
 import { Button } from '@/shared/components/ui/button';
+
 
 // 전역 헤더 — 피그마 메인 디자인의 메가메뉴 구조를 프로젝트 컨벤션(테마 토큰)으로 재구현.
 // 레이아웃: [로고 w-36 고정] [네비 flex-1 4등분] [인증영역 w-48 고정] — 드롭다운 패널도 동일 3존 구조로 컬럼 정렬.
@@ -95,9 +96,9 @@ export function Header() {
           })}
         </nav>
 
-        {/* 인증 영역 — 로그인 상태 분기 */}
+        {/* 인증 영역 — 로그인 상태 분기 (GUEST는 USER와 다른 UI) */}
         <div className={`hidden ${AUTH_W} shrink-0 items-center justify-end gap-2 md:flex`}>
-          {user ? <UserMenu nickname={user.nickname} /> : <GuestMenu />}
+          {!user ? <GuestMenu /> : user.role === 'GUEST' ? <IncompleteMenu /> : <UserMenu nickname={user.nickname} />}
         </div>
       </div>
 
@@ -190,6 +191,38 @@ function UserMenu({ nickname }: { nickname: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+}
+
+/** GUEST(소셜 가입 미완료): 닉네임 대신 "추가정보 필요" 배지 + 로그아웃 */
+function IncompleteMenu() {
+  const navigate = useNavigate();
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // 로그아웃은 실패해도 로그아웃
+    } finally {
+      clearAuth();
+      navigate('/');
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => navigate('/signup/social')}
+        className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1.5 text-sm font-semibold text-ring transition-colors hover:bg-primary/25"
+      >
+        <AlertCircle size={14} />
+        추가정보 입력
+      </button>
+      <Button variant="outline" className="rounded-full" onClick={handleLogout}>
+        로그아웃
+      </Button>
     </>
   );
 }
