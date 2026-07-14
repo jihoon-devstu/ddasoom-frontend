@@ -13,24 +13,43 @@ import { Button } from '@/shared/components/ui/button';
 
 
 // 전역 헤더 — 피그마 메인 디자인의 메가메뉴 구조를 프로젝트 컨벤션(테마 토큰)으로 재구현.
-// 레이아웃: [로고 w-36 고정] [네비 flex-1 4등분] [인증영역 w-48 고정] — 드롭다운 패널도 동일 3존 구조로 컬럼 정렬.
-// ⚠️ 하위 메뉴 경로는 각 도메인 담당자와 협의 후 확정 — 미정 경로는 '#'(TODO) 상태.
+// 네비 메뉴 정의 — 하위 경로는 각 도메인 담당자와 협의된 확정 경로.
+// ⚠️ 고객센터 하위 3개는 경로만 예약된 상태 — 페이지는 담당자 구현 예정 (라우트 등록 전까지 404 정상)
 const NAV_MENUS = [
-  { label: '따숨', items: [{ name: 'About', to: '#' }, { name: '서비스 안내', to: '#' }] },
-  { label: '유기동물', items: [{ name: '유기동물조회', to: '/animals' }] },
   {
-    label: '커뮤니티',
+    label: '유기동물',
     items: [
-      { name: '고양이', to: '/board?category=cat' },
-      { name: '강아지', to: '/board?category=dog' },
-      { name: '입양후기', to: '#' },
+      { label: '보호 동물 찾기', to: '/animals' },
+    ],
+  },
+  {
+    label: '임시보호',
+    items: [
+      { label: '임시보호 신청', to: '/foster/apply' },
+      { label: '신청 내역', to: '/mypage/fosters' },
+    ],
+  },
+  {
+    label: '펫 커뮤니티',
+    items: [
+      { label: '고양이', to: '/board?category=CATCOMMUNITY' },
+      { label: '강아지', to: '/board?category=DOGCOMMUNITY' },
+      { label: '입양 후기', to: '/board?category=REVIEW' },
     ],
   },
   {
     label: '고객센터',
     items: [
-      { name: '공지사항', to: '#' }, { name: 'Q&A', to: '#' },
-      { name: 'FAQ', to: '#' }, { name: 'Contact', to: '#' },
+      { label: '공지사항', to: '/support/notices' },
+      { label: 'FAQ', to: '/support/faq' },
+      { label: '1:1 문의', to: '/support/qna' },
+    ],
+  },
+  {
+    label: '따숨 소개',
+    items: [
+      { label: '따숨 이야기', to: '/about' },
+      { label: '이용 안내', to: '/guide' },
     ],
   },
 ];
@@ -115,7 +134,7 @@ export function Header() {
                 >
                   {menu.items.map((item) => (
                     <Link
-                      key={item.name}
+                      key={item.label}
                       to={item.to}
                       onClick={() => setActiveMenu(null)}
                       // [타이포] text-sm → text-base
@@ -123,7 +142,7 @@ export function Header() {
                         menu.label === activeMenu ? 'text-foreground' : 'text-muted-foreground'
                       }`}
                     >
-                      {item.name}
+                      {item.label}
                     </Link>
                   ))}
                 </div>

@@ -25,6 +25,8 @@ import { MyPostsTab } from '@/pages/mypage/MyPostsTab';
 import { MyCommentsTab } from '@/pages/mypage/MyCommentsTab';
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
+import { AboutPage } from '@/pages/about/AboutPage';
+import { GuidePage } from '@/pages/about/GuidePage';
 
 // 전체 라우트 정의(단일 파일에서 관리). 역할별 라우트를 한곳에 모아 등록한다.
 // 현재는 경로 등록 + placeholder 페이지 연결까지만. 각 페이지 실제 구현은 도메인 담당자 몫.
@@ -36,6 +38,8 @@ export const router = createBrowserRouter([
       { index: true, element: <MainPage /> }, // `/`
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignupPage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'guide', element: <GuidePage /> },
       { path: 'oauth/callback', element: <OAuthCallbackPage /> },   // 소셜 로그인 착지 (백엔드 SuccessHandler 리다이렉트 대상)
       { path: 'reset-password', element: <ResetPasswordPage /> },   // 비밀번호 재설정 메일 링크 착지
       {
