@@ -28,7 +28,7 @@ export const queryKeys = {
   // features/admin — 공지사항, Faq, Qna, 관리자페이지
   admin: {
     all: ['admin'] as const,
-    // ===== 공지사항 (이서진) =======
+        // ===== 공지사항 (이서진) =======
     notices: () => [...queryKeys.admin.all, 'notices'] as const,
     noticeList: (params: { page?: number; size?: number }) =>
       [...queryKeys.admin.notices(), 'list', params] as const,
@@ -41,11 +41,17 @@ export const queryKeys = {
     faqDetail: (id: number) => [...queryKeys.admin.faqs(), 'detail', id] as const,
     faqCategories: () => [...queryKeys.admin.all, 'faqCategories'] as const,
     // ===== QNA (이서진) =======
-    
-    // ===== 구지훈 (유저 관리) =======
+   
 
+    // ===== 구지훈 (유저 관리) =======
+    members: () => [...queryKeys.admin.all, 'members'] as const,
+    memberList: (params: { keyword?: string; role?: string; page?: number; size?: number }) =>
+      [...queryKeys.admin.members(), 'list', params] as const,
+    memberDetail: (id: number) =>
+      [...queryKeys.admin.members(), 'detail', id] as const,
+    memberLoginLogs: (id: number, page: number) =>
+      [...queryKeys.admin.members(), 'loginLogs', id, page] as const,
     // ===== 김경우 (임시보호 신청 관리) =======
-    
     // ===== 유창호 (게시글 관리) =======
   },
 
@@ -58,9 +64,5 @@ export const queryKeys = {
       [...queryKeys.support.notices(), 'list', params] as const,
     noticeDetail: (id: number) =>
       [...queryKeys.support.notices(), 'detail', id] as const,
-    // FAQ는 페이징 없이 목록 전체를 받는다 — faqs() 하나로 목록 전체 무효화
-    faqs: () => [...queryKeys.support.all, 'faqs'] as const,
-    faqDetail: (id: number) => [...queryKeys.support.faqs(), 'detail', id] as const,
-    faqCategories: () => [...queryKeys.support.all, 'faqCategories'] as const,
   },
 } as const;
