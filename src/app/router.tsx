@@ -28,6 +28,8 @@ import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminNoticeListPage } from '@/pages/admin/AdminNoticeListPage';
 import { AdminNoticeFormPage } from '@/pages/admin/AdminNoticeFormPage';
+import { AdminMemberListPage } from '@/pages/admin/AdminMemberListPage';
+import { AdminMemberDetailPage } from '@/pages/admin/AdminMemberDetailPage';
 import { AdminFaqListPage } from '@/pages/admin/AdminFaqListPage';
 import { AdminFaqFormPage } from '@/pages/admin/AdminFaqFormPage';
 import { AboutPage } from '@/pages/about/AboutPage';
@@ -109,6 +111,8 @@ export const router = createBrowserRouter([
           // ===== QNA (이서진) =======
 
           // ===== 유저 관리 (구지훈) =======
+          { path: 'members', element: <AdminMemberListPage /> },
+          { path: 'members/:memberId', element: <AdminMemberDetailPage /> },
 
           // ===== 임시보호 신청 관리 (김경우) =======
 

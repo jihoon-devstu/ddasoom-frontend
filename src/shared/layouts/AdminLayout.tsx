@@ -8,6 +8,7 @@ const MENU_ITEMS = [
   { label: '공지사항', path: '/admin/notices' },
   { label: 'FAQ', path: '/admin/faqs' },
   { label: 'QnA', path: '/admin/qnas' },
+  { label: '유저 관리', path: '/admin/members' },
 ] as const;
 
 export function AdminLayout() {
