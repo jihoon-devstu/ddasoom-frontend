@@ -64,3 +64,13 @@ export interface PostListParams {
   page?: number;
   size?: number;
 }
+
+//
+export interface PostCreatePayload {
+  boardType: string; // "ADOPTION_REVIEW" 고정
+  category: string; // "강아지" | "고양이"
+  title: string;
+  content: string; // getPayload().html
+  imageIds: number[]; // getPayload().imageIds
+  thumbnailImageId: number | null;
+}
