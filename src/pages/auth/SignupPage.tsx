@@ -72,6 +72,8 @@ export function SignupPage() {
     } catch (error) {
       if (isAxiosError(error) && error.response?.data?.code === 'AUTH_001') {
         setError('email', { message: '이미 가입된 이메일입니다.' });
+      } else if (isAxiosError(error) && error.response?.data?.code === 'AUTH_006') {
+        toast.error('인증 메일은 1분에 한 번만 발송할 수 있어요. 잠시 후 다시 시도해 주세요.');
       } else {
         toast.error('메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
       }
