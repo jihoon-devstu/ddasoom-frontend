@@ -18,7 +18,22 @@ export const queryKeys = {
   // features/auth
   auth: {},
   // features/animals — 유기동물
-  animals: {},
+  animals: {
+    all: () => ['animals'] as const, // 도메인 전체(목록/상세/좋아요목록) 무효화·낙관적 패치 루트
+    lists: () => [...queryKeys.animals.all(), 'list'] as const,
+    // filters 객체가 그대로 키에 들어가므로, 값 있는 필드만 담아 안정적 키를 유지할 것
+    // (타입은 shared→feature 역의존을 피하려 인라인 구조로 둠 — features/animals/types.ts의 AnimalFilters와 동일 구조)
+    list: (filters: {
+      kind?: 'D' | 'C';
+      gender?: 'M' | 'F' | 'Q';
+      location?: string;
+      isFostered?: boolean;
+      isLiked?: boolean;
+    }) => [...queryKeys.animals.lists(), filters] as const,
+    details: () => [...queryKeys.animals.all(), 'detail'] as const,
+    detail: (id: number) => [...queryKeys.animals.details(), id] as const,
+    likedByMe: () => [...queryKeys.animals.all(), 'liked-by-me'] as const, // 마이페이지 좋아요 목록
+  },
   // features/board — 정보교환/입양후기 통합(boardType 파라미터로 분기)
   board: {},
   // features/foster — 임시보호
@@ -64,5 +79,9 @@ export const queryKeys = {
       [...queryKeys.support.notices(), 'list', params] as const,
     noticeDetail: (id: number) =>
       [...queryKeys.support.notices(), 'detail', id] as const,
+    // FAQ는 페이징 없이 목록 전체를 받는다 — faqs() 하나로 목록 전체 무효화
+    faqs: () => [...queryKeys.support.all, 'faqs'] as const,
+    faqDetail: (id: number) => [...queryKeys.support.faqs(), 'detail', id] as const,
+    faqCategories: () => [...queryKeys.support.all, 'faqCategories'] as const,
   },
 } as const;
