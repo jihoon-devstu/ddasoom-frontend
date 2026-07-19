@@ -62,6 +62,9 @@ export interface FosterAdminListItem {
   reviewerId: number | null;
   reviewerNickname: string | null;
   status: FosterStatus;
+  fosterStartAt: string | null;
+  fosterEndAt: string | null;
+  fosterExtendAt: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;

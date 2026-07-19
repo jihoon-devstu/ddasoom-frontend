@@ -125,6 +125,7 @@ export const router = createBrowserRouter([
 
           // ===== 임시보호 신청 관리 (김경우) =======
           { path: 'fosters', element: <AdminFosterListPage /> },
+          { path: 'active-fosters', element: <AdminFosterListPage activeOnly /> },
           { path: 'fosters/:fosterId/edit', element: <AdminFosterEditPage /> },
           { path: 'fosters/:fosterId', element: <AdminFosterDetailPage /> },
           // ===== 게시글 관리 (유창호) =======
