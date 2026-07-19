@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/shared/stores/authStore';
 import { cn } from '@/shared/components/ui/utils';
+import { Flag } from 'lucide-react';
 
 // 관리자 사이드바 메뉴 정의 — 새 관리 페이지 추가 시 여기에 한 줄만 추가
 const MENU_ITEMS = [
@@ -9,6 +10,7 @@ const MENU_ITEMS = [
   { label: 'FAQ', path: '/admin/faqs' },
   { label: 'QnA', path: '/admin/qnas' },
   { label: '유저 관리', path: '/admin/members' },
+  { label: '신고 관리', path: '/admin/reports', icon: Flag }, 
 ] as const;
 
 export function AdminLayout() {
