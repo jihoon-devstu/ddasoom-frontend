@@ -19,6 +19,10 @@ import {
 
 type StatusFilter = 'ALL' | 'ACTIVE' | FosterStatus;
 
+const FALLBACK_IMAGE =
+  import.meta.env.VITE_IMAGE_PLACEHOLDER ??
+  'https://placehold.co/400x300/FFF3D6/9C8B75?text=No+Image';
+
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'ALL', label: '전체' },
   { value: 'PENDING', label: '신청 대기' },
@@ -110,16 +114,10 @@ export function AdminFosterListPage({
     <div className="p-6">
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <HandHeart className="text-ring" size={24} />
           <h1 className="text-xl font-semibold">
             {activeOnly ? '임시보호 중 관리' : '임시보호 신청 관리'}
           </h1>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {activeOnly
-            ? '현재 임시보호 중이거나 연장된 신청의 일정을 관리합니다.'
-            : '임시보호 신청 현황과 처리 상태를 확인합니다.'}
-        </p>
       </div>
 
       {!activeOnly && (
@@ -284,6 +282,10 @@ export function AdminFosterListPage({
                               <img
                                 src={foster.animalImageUrl}
                                 alt={foster.animalNickname}
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null;
+                                  event.currentTarget.src = FALLBACK_IMAGE;
+                                }}
                                 className="h-9 w-9 rounded-md object-cover"
                               />
                             ) : (
@@ -317,6 +319,10 @@ export function AdminFosterListPage({
                               <img
                                 src={foster.animalImageUrl}
                                 alt={foster.animalNickname}
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null;
+                                  event.currentTarget.src = FALLBACK_IMAGE;
+                                }}
                                 className="h-9 w-9 rounded-md object-cover"
                               />
                             ) : (

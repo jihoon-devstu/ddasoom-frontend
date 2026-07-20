@@ -18,6 +18,10 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 
+const FALLBACK_IMAGE =
+  import.meta.env.VITE_IMAGE_PLACEHOLDER ??
+  'https://placehold.co/400x300/FFF3D6/9C8B75?text=No+Image';
+
 function formatDateTime(iso: string): string {
   const date = new Date(iso);
 
@@ -181,6 +185,10 @@ export function AdminFosterDetailPage() {
             <img
               src={data.animalImageUrl}
               alt={data.animalNickname}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = FALLBACK_IMAGE;
+              }}
               className="h-20 w-20 rounded-md object-cover"
             />
           ) : (
