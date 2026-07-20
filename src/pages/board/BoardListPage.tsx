@@ -15,10 +15,12 @@ export function BoardListPage() {
 
   const [page, setPage] = useState(0);
   const [category, setCategory] = useState<string | undefined>(undefined); // undefined = 전체
+  const [keywordInput, setKeywordInput] = useState(''); // 입력 중 텍스트
+  const [keyword, setKeyword] = useState<string | undefined>(undefined); // 제출된 검색어 (undefined = 검색 없음)
 
   // 훅 규칙상 조건부 return 이전에 모든 훅 호출. board 없으면 enabled=false로 조회 스킵.
   const { data, isLoading, error } = usePostsQuery(
-    { boardType: board?.boardType ?? '', category, page },
+    { boardType: board?.boardType ?? '', category, keyword, page },
     !!board,
   );
 
@@ -26,6 +28,8 @@ export function BoardListPage() {
   useEffect(() => {
     setPage(0);
     setCategory(undefined);
+    setKeywordInput('');
+    setKeyword(undefined);
   }, [board?.boardType]);
 
   if (!board) return <NotFoundPage />;
@@ -33,6 +37,14 @@ export function BoardListPage() {
   const handleCategoryChange = (value: string | undefined) => {
     setCategory(value);
     setPage(0); // 필터 바꾸면 첫 페이지부터
+  };
+
+  // 빈 입력 제출 = 검색 해제(전체 목록 복귀). 백엔드도 공백을 "검색 없음"으로 정규화하지만
+  // undefined로 보내면 axios가 파라미터를 아예 제외해 URL이 깔끔하다 (category와 동일 패턴).
+  const handleSearch = () => {
+    const trimmed = keywordInput.trim();
+    setKeyword(trimmed.length > 0 ? trimmed : undefined);
+    setPage(0); // 검색하면 첫 페이지부터
   };
 
   return (
@@ -60,22 +72,23 @@ export function BoardListPage() {
 
         <div className='w-px bg-border' />
 
-        {/* 검색 — 자리만 배치. ⚠️ 백엔드 게시글 검색 API가 아직 없어 비활성 상태.
-            API(GET /api/posts 에 keyword 파라미터 등)가 준비되면 아래 input/button을
-            제어 상태 + 검색 핸들러로 연결하고 disabled 를 제거하면 됩니다. */}
+        {/* 검색 — 제목 부분일치 (GET /api/posts?keyword=). Enter 또는 버튼으로 제출 */}
         <div className='flex flex-1'>
           <input
             type='text'
-            placeholder='검색 준비 중'
-            disabled
-            className='w-full rounded-xl border border-border bg-secondary px-4 text-base placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60'
+            placeholder='제목으로 검색'
+            value={keywordInput}
+            onChange={(e) => setKeywordInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch();
+            }}
+            className='w-full rounded-xl border border-border bg-secondary px-4 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40'
           />
         </div>
         <button
           type='button'
-          disabled
-          title='검색 기능 준비 중'
-          className='flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ring px-6 text-base font-bold text-white transition-all disabled:cursor-not-allowed disabled:opacity-50'
+          onClick={handleSearch}
+          className='flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ring px-6 text-base font-bold text-white transition-all hover:brightness-105'
         >
           <Search size={16} />
           검색
@@ -93,7 +106,9 @@ export function BoardListPage() {
 
       {data && data.content.length === 0 && (
         <p className='py-20 text-center text-muted-foreground'>
-          아직 게시글이 없습니다.
+          {keyword
+            ? `'${keyword}' 검색 결과가 없습니다.`
+            : '아직 게시글이 없습니다.'}
         </p>
       )}
 

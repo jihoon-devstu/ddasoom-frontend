@@ -70,6 +70,7 @@ export interface PostListItem {
 export interface PostListParams {
   boardType: string;
   category?: string;
+  keyword?: string; // 제목 부분일치 검색. undefined = 검색 없음 (axios가 파라미터 자동 제외)
   page?: number;
   size?: number;
 }
