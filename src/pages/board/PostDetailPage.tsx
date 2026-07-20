@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 
-import { resolveBoard } from '@/features/board/types';
+import { resolveBoard, resolveSlugByBoardType } from '@/features/board/types';
 import { usePostDetailQuery } from '@/features/board/hooks/usePostQuery';
 import { useDeletePost } from '@/features/board/hooks/useDeletePost';
 import { CommentSection } from '@/features/board/components/CommentSection';
@@ -57,8 +57,9 @@ export function PostDetailPage() {
   }
 
   const isAuthor = user != null && user.memberId === data.author.memberId;
-  // 수정 화면(ReviewWritePage)은 입양후기 전용 → 다른 게시판 글은 수정 버튼 미노출.
-  const canEdit = isAuthor && data.boardType === 'ADOPTION_REVIEW';
+  // 수정 경로는 URL slug가 아니라 게시글의 실제 boardType 기준으로 생성 (slug 불일치 진입 방어).
+  const editSlug = resolveSlugByBoardType(data.boardType);
+  const canEdit = isAuthor && editSlug != null;
 
   const handleDelete = () => {
     // window.confirm으로 최소 구현 — 디자인 통일이 필요해지면 ui/alert-dialog로 교체
@@ -108,7 +109,9 @@ export function PostDetailPage() {
             {canEdit && (
               <Button
                 variant='outline'
-                onClick={() => navigate(`/board/review/${data.postId}/edit`)}
+                onClick={() =>
+                  navigate(`/board/${editSlug}/${data.postId}/edit`)
+                }
               >
                 수정
               </Button>
