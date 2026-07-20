@@ -35,6 +35,7 @@ export const queryKeys = {
     details: () => [...queryKeys.animals.all(), "detail"] as const,
     detail: (id: number) => [...queryKeys.animals.details(), id] as const,
     likedByMe: () => [...queryKeys.animals.all(), "liked-by-me"] as const, // 마이페이지 좋아요 목록
+    main: () => [...queryKeys.animals.all(), 'main'] as const,
   },
   // features/board — 정보교환/입양후기 통합(boardType 파라미터로 분기) (유창호)
   // features/board — 정보교환/입양후기 통합(boardType 파라미터로 분기) (유창호)
