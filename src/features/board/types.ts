@@ -61,6 +61,8 @@ export interface PostCreatePayload {
   thumbnailImageId: number | null;
 }
 
+export type PostUpdatePayload = PostCreatePayload;
+
 // ===== 게시글 상세 / 댓글 =====
 
 export interface PostImage {
