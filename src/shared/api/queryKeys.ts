@@ -74,6 +74,12 @@ export const queryKeys = {
   // features/admin — 공지사항, Faq, Qna, 관리자페이지 (이서진)
   admin: {
     all: ['admin'] as const,
+    // ===== 대시보드 (구지훈) =======
+    dashboard: () => [...queryKeys.admin.all, 'dashboard'] as const,
+    dashboardPendingSummary: () => [...queryKeys.admin.dashboard(), 'pendingSummary'] as const,
+    dashboardStatusDistribution: () => [...queryKeys.admin.dashboard(), 'statusDistribution'] as const,
+    dashboardNewMembers: () => [...queryKeys.admin.dashboard(), 'newMembers'] as const,
+    
     // ===== 공지사항 (이서진) =======
     notices: () => [...queryKeys.admin.all, 'notices'] as const,
     noticeList: (params: { page?: number; size?: number }) =>
@@ -154,4 +160,5 @@ export const queryKeys = {
       [...queryKeys.support.faqs(), 'detail', id] as const,
     faqCategories: () => [...queryKeys.support.all, 'faqCategories'] as const,
   },
+
 } as const;
