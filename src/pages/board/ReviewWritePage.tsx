@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,8 +21,15 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useCreatePost } from '@/features/board/hooks/useCreatePost';
+import { useUpdatePost } from '@/features/board/hooks/useUpdatePost';
+import { usePostDetailQuery } from '@/features/board/hooks/usePostDetailQuery';
+import { useAuthStore } from '@/shared/stores/authStore';
 
-// 입양후기(ADOPTION_REVIEW) 작성 페이지.
+// 입양후기(ADOPTION_REVIEW) 작성/수정 겸용 페이지.
+// - /board/review/write          → 작성 모드
+// - /board/review/:postId/edit   → 수정 모드 (AdminNoticeFormPage의 new/edit 겸용 패턴 준수)
+// 수정 모드에서는 상세 조회 HTML(영구 URL + data-image-id)을 에디터 initialHtml로 주입한다.
+// DeferredImage가 data-image-id를 파싱하므로 기존 이미지도 extractImageIds에 그대로 잡힌다.
 
 const REVIEW_CATEGORIES = ['강아지', '고양이'] as const;
 
@@ -38,8 +45,17 @@ type ReviewForm = z.infer<typeof reviewSchema>;
 
 export function ReviewWritePage() {
   const navigate = useNavigate();
+  const { postId } = useParams();
+  const isEdit = postId != null;
+  const numericId = isEdit ? Number(postId) : null;
+
+  const user = useAuthStore((s) => s.user);
   const editorRef = useRef<RichTextEditorHandle>(null);
   const createPost = useCreatePost();
+  const updatePost = useUpdatePost();
+
+  // 수정 모드에서만 상세 조회. ⚠️ 백엔드 스펙상 조회수 +1 부수효과 있음(boardApi 주석 참고).
+  const { data: post, isError } = usePostDetailQuery(numericId);
 
   // 이미지 업로드(getPayload) 구간은 mutation 밖이라 isPending 으로 안 잡힘 → 별도 상태로 전체를 덮는다.
   const [isSaving, setIsSaving] = useState(false);
@@ -48,11 +64,42 @@ export function ReviewWritePage() {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<ReviewForm>({
     resolver: zodResolver(reviewSchema),
     defaultValues: { category: '', title: '' },
   });
+
+  // 수정 모드 — 상세 로드되면 폼 필드 채움. 본문은 에디터 initialHtml 로 초기화되므로 여기선 제외.
+  useEffect(() => {
+    if (isEdit && post) {
+      reset({ category: post.category, title: post.title });
+    }
+  }, [isEdit, post, reset]);
+
+  // 수정 모드 가드 — 실검증(403 BOARD_002)은 백엔드 몫, 여기선 UX용 선차단.
+  // 이 페이지는 입양후기 전용이므로 다른 boardType 게시글 진입도 차단한다.
+  useEffect(() => {
+    if (!isEdit || !post) return;
+    if (post.boardType !== 'ADOPTION_REVIEW') {
+      toast.error('입양 후기 게시글만 수정할 수 있습니다.');
+      navigate('/board/review', { replace: true });
+      return;
+    }
+    if (user && post.author.memberId !== user.memberId) {
+      toast.error('본인이 작성한 게시글만 수정할 수 있습니다.');
+      navigate('/board/review', { replace: true });
+    }
+  }, [isEdit, post, user, navigate]);
+
+  // 없거나 삭제된 게시글(BOARD_001) — 목록으로 돌려보낸다.
+  useEffect(() => {
+    if (isEdit && isError) {
+      toast.error('게시글을 찾을 수 없습니다.');
+      navigate('/board/review', { replace: true });
+    }
+  }, [isEdit, isError, navigate]);
 
   const onSubmit = async (form: ReviewForm) => {
     if (isSaving || !editorRef.current) return;
@@ -77,38 +124,62 @@ export function ReviewWritePage() {
         return;
       }
 
-      // 3) 게시글 저장. 성공 토스트/목록 무효화는 useCreatePost.onSuccess 가 담당.
+      // 3) 게시글 저장. 성공 토스트/캐시 무효화는 각 mutation 훅의 onSuccess 가 담당.
+      //    대표 이미지 정책: 본문 첫 이미지 = 썸네일 (작성과 동일 규칙 — 명시 선택 UI 도입 전까지 유지).
+      //    수정 시 imageIds 는 "최종" 목록 — 빠진 기존 이미지는 백엔드 syncImages 가 soft delete.
+      const body = {
+        boardType: 'ADOPTION_REVIEW',
+        category: form.category,
+        title: form.title,
+        content: payload.html,
+        imageIds: payload.imageIds,
+        thumbnailImageId: payload.imageIds[0] ?? null,
+      };
+      let savedPostId: number;
       try {
-        await createPost.mutateAsync({
-          boardType: 'ADOPTION_REVIEW',
-          category: form.category,
-          title: form.title,
-          content: payload.html,
-          imageIds: payload.imageIds,
-          thumbnailImageId: payload.imageIds[0] ?? null, // ← 이미지 있으면 첫 장을 대표로, 없으면 null
-        });
+        if (isEdit && numericId != null) {
+          await updatePost.mutateAsync({ postId: numericId, payload: body });
+          savedPostId = numericId;
+        } else {
+          savedPostId = await createPost.mutateAsync(body); // createPost는 postId 반환
+        }
       } catch (err) {
         // 백엔드 ApiResponse.message 는 사용자 노출용 문구이므로 그대로 안내.
         const message = axios.isAxiosError(err)
           ? (err.response?.data?.message as string | undefined)
           : undefined;
         toast.error(
-          message ?? '게시글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          message ??
+            (isEdit
+              ? '게시글 수정에 실패했습니다. 잠시 후 다시 시도해주세요.'
+              : '게시글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.'),
         );
         return;
       }
 
-      // 4) 저장 성공 후에만 임시 blob(IndexedDB) 정리 + 목록으로 이동.
+      // 4) 저장 성공 후에만 임시 blob(IndexedDB) 정리 + 상세로 이동.
       await editorRef.current.cleanup();
-      navigate('/board/review');
+      navigate(`/board/review/${savedPostId}`);
     } finally {
       setIsSaving(false);
     }
   };
 
+  // 수정 모드: 상세 로드 전에는 에디터를 마운트하지 않는다.
+  // useEditor 의 content 는 초기화 시점에만 반영되므로, 데이터 확보 후 initialHtml 과 함께 마운트해야 한다.
+  if (isEdit && !post) {
+    return (
+      <div className='mx-auto max-w-3xl px-4 py-8'>
+        <p className='text-sm text-muted-foreground'>게시글을 불러오는 중...</p>
+      </div>
+    );
+  }
+
   return (
     <div className='mx-auto max-w-3xl px-4 py-8'>
-      <h1 className='mb-6 text-xl font-semibold'>입양 후기 작성</h1>
+      <h1 className='mb-6 text-xl font-semibold'>
+        {isEdit ? '입양 후기 수정' : '입양 후기 작성'}
+      </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
         <div className='space-y-2'>
@@ -155,13 +226,20 @@ export function ReviewWritePage() {
           <RichTextEditor
             ref={editorRef}
             ownerType='POST'
+            initialHtml={isEdit && post ? post.content : ''}
             placeholder='입양 후기를 남겨주세요'
           />
         </div>
 
         <div className='flex gap-2'>
           <Button type='submit' disabled={isSaving}>
-            {isSaving ? '등록 중...' : '등록'}
+            {isSaving
+              ? isEdit
+                ? '수정 중...'
+                : '등록 중...'
+              : isEdit
+                ? '수정 완료'
+                : '등록'}
           </Button>
           <Button
             type='button'
