@@ -157,7 +157,7 @@ function getServerErrorMessage(error: unknown): string {
   }
 
   if (code === 'FOSTER_018') {
-    return '종료 처리 시 기존 임시보호 일정은 수정할 수 없습니다.';
+  return '해당 동물은 이미 다른 임시보호 신청이 진행 중입니다.';
   }
 
   if (code === 'FOSTER_003') {
