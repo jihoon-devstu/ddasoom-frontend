@@ -59,9 +59,9 @@ export function LoginPage() {
       if (code === 'AUTH_101') {
         setError('root', { message: '이메일 또는 비밀번호가 일치하지 않습니다.' });
       } else if (code === 'AUTH_109') {
-        setError('root', { message: '탈퇴 처리된 계정이에요. 계정 복구를 원하시면 1:1 문의를 이용해 주세요.' });
+        setError('root', { message: '탈퇴 처리된 계정이에요. 계정 복구를 원하시면 관리자 이메일로 연락해 주세요' });
       } else if (code === 'AUTH_110') {
-        setError('root', { message: '이용이 제한된 계정이에요. 자세한 사항은 1:1 문의를 이용해 주세요.' });
+        setError('root', { message: '이용이 제한된 계정이에요. 자세한 사항은 관리자 이메일로 연락해 주세요' });
       } else {
         toast.error('로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       }
