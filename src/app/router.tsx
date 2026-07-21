@@ -22,6 +22,7 @@ import { MyPageLayout } from '@/pages/mypage/MyPageLayout';
 import { ProfileTab } from '@/pages/mypage/ProfileTab';
 import { LikedAnimalsTab } from '@/pages/mypage/LikedAnimalsTab';
 import { FosterHistoryTab } from '@/pages/mypage/FosterHistoryTab';
+import { MyPostsTab } from '@/pages/mypage/MyPostsTab';
 import { MyCommentsTab } from '@/pages/mypage/MyCommentsTab';
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
@@ -36,7 +37,6 @@ import { AdminQnaListPage } from '@/pages/admin/AdminQnaListPage';
 import { AdminQnaDetailPage } from '@/pages/admin/AdminQnaDetailPage';
 import { AdminReportListPage } from '@/pages/admin/AdminReportListPage';
 import { AdminReportDetailPage } from '@/pages/admin/AdminReportDetailPage';
-import { AdminAnimalSyncPage } from '@/pages/admin/AdminAnimalSyncPage';
 import { QnaListPage } from '@/pages/qna/QnaListPage';
 import { QnaWritePage } from '@/pages/qna/QnaWritePage';
 import { QnaDetailPage } from '@/pages/qna/QnaDetailPage';
@@ -53,7 +53,6 @@ import { AdminFosterListPage } from '@/pages/admin/AdminFosterListPage';
 import { AdminFosterDetailPage } from '@/pages/admin/AdminFosterDetailPage';
 import { AdminFosterEditPage } from '@/pages/admin/AdminFosterEditPage';
 import { PostWritePage } from '@/pages/board/PostWritePage';
-import { MyPostsTab } from '@/pages/mypage/MyPostsTab';
 
 // 전체 라우트 정의(단일 파일에서 관리). 역할별 라우트를 한곳에 모아 등록한다.
 // 현재는 경로 등록 + placeholder 페이지 연결까지만. 각 페이지 실제 구현은 도메인 담당자 몫.
@@ -158,8 +157,7 @@ export const router = createBrowserRouter([
           { path: 'fosters/:fosterId', element: <AdminFosterDetailPage /> },
           // ===== 게시글 관리 (유창호) =======
 
-          // ===== 유기동물 동기화 (김종식) =======
-          { path: 'animals/sync', element: <AdminAnimalSyncPage /> },
+          // ===== 유기동물 동기화 (김종식) - 대시보드 우측 상단 버튼으로 이동, 별도 라우트 없음 =======
 
           { path: '*', element: <AdminDashboardPage /> }, // /admin/** (관리 서브페이지 자리)
         ],
