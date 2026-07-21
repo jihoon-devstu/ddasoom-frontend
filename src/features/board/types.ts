@@ -109,6 +109,31 @@ export interface PostDetail {
   updatedAt: string;
 }
 
+// ===== 마이페이지 (내가 쓴 글 / 내가 쓴 댓글) =====
+
+// 응답: board/dto/response/MyPostResponse.java — boardType 포함(상세 경로 조립용), author 없음(본인 글)
+export interface MyPostItem {
+  postId: number;
+  boardType: string; // DOG_INFO / CAT_INFO / ADOPTION_REVIEW — resolveSlugByBoardType로 slug 변환
+  category: string;
+  title: string;
+  contentPreview: string;
+  thumbnailUrl: string | null;
+  viewCount: number;
+  commentCount: number;
+  createdAt: string;
+}
+
+// 응답: board/dto/response/MyCommentResponse.java — 댓글 + 원글 정보(제목/boardType)
+export interface MyCommentItem {
+  commentId: number;
+  content: string;
+  createdAt: string;
+  postId: number;
+  postTitle: string;
+  boardType: string;
+}
+
 export interface CommentItem {
   commentId: number;
   author: Author;
