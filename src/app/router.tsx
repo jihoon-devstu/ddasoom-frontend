@@ -50,8 +50,10 @@ import { PostDetailPage } from '@/pages/board/PostDetailPage';
 import { FosterDetailPage } from '@/pages/foster/FosterDetailPage';
 import { FosterEditPage } from '@/pages/foster/FosterEditPage';
 import { AdminFosterListPage } from '@/pages/admin/AdminFosterListPage';
-import { AdminFosterDetailPage } from '@/pages/admin/AdminFosterDetailPage';
-import { AdminFosterEditPage } from '@/pages/admin/AdminFosterEditPage';
+import { AdminFosterApplicationDetailPage } from '@/pages/admin/AdminFosterApplicationDetailPage';
+import { AdminFosterProgressDetailPage } from '@/pages/admin/AdminFosterProgressDetailPage';
+import { AdminFosterApplicationEditPage } from '@/pages/admin/AdminFosterApplicationEditPage';
+import { AdminFosterProgressEditPage } from '@/pages/admin/AdminFosterProgressEditPage';
 import { PostWritePage } from '@/pages/board/PostWritePage';
 
 // 전체 라우트 정의(단일 파일에서 관리). 역할별 라우트를 한곳에 모아 등록한다.
@@ -148,13 +150,40 @@ export const router = createBrowserRouter([
           { path: 'statistics', element: <AdminStatisticsPage /> },
 
           // ===== 임시보호 신청 관리 (김경우) =======
-          { path: 'fosters', element: <AdminFosterListPage /> },
+          {
+            path: 'fosters',
+            element: (
+              <AdminFosterListPage
+                key="application-foster-list"
+                scope="APPLICATION"
+              />
+            ),
+          },
+          {
+            path: 'fosters/:fosterId/edit',
+            element: <AdminFosterApplicationEditPage />,
+          },
+          {
+            path: 'fosters/:fosterId',
+            element: <AdminFosterApplicationDetailPage />,
+          },
           {
             path: 'active-fosters',
-            element: <AdminFosterListPage activeOnly />,
+            element: (
+              <AdminFosterListPage
+                key="progress-foster-list"
+                scope="PROGRESS"
+              />
+            ),
           },
-          { path: 'fosters/:fosterId/edit', element: <AdminFosterEditPage /> },
-          { path: 'fosters/:fosterId', element: <AdminFosterDetailPage /> },
+          {
+            path: 'active-fosters/:fosterId/edit',
+            element: <AdminFosterProgressEditPage />,
+          },
+          {
+            path: 'active-fosters/:fosterId',
+            element: <AdminFosterProgressDetailPage />,
+          },
           // ===== 게시글 관리 (유창호) =======
 
           { path: '*', element: <AdminDashboardPage /> }, // /admin/** (관리 서브페이지 자리)
