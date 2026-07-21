@@ -17,5 +17,67 @@ export interface AnimalPreview {
   location: string;            // 보호 장소
   likeCount: number;
   isFostered: boolean;         // 임시보호 중 여부 — 카드 상태 뱃지의 파생 근거
+  isLiked: boolean;
   imageUrl: string | null;     // ⚠️ NULL 가능 — 카드에서 placeholder 처리 필수
+}
+
+// ── 여기부터 유기동물 담당(새싹3) 실API 계약 ────────────────────────────
+
+/** 종/성별 코드 (DB 원본 코드 — 표시 변환은 프론트 책임) */
+export type AnimalKindCode = 'D' | 'C';       // D=강아지, C=고양이
+export type AnimalGenderCode = 'M' | 'F' | 'Q'; // 수/암/미상
+
+/**
+ * 목록/마이페이지 카드 1건.
+ * 백엔드: animal/dto/response/AnimalListPageResponse.java 와 1:1.
+ * (마이페이지 AnimalMyPageResponse는 isLiked 필드가 없지만, 정의상 전부 좋아요한 동물이므로
+ *  프론트에서 isLiked=true로 채워 이 타입으로 통일해 카드 재사용.)
+ */
+export interface AnimalListItem {
+  animalId: number;
+  kind: AnimalKindCode;
+  nickname: string;
+  gender: AnimalGenderCode;
+  typeName: string;
+  age: string;                 // 공공API 원본 문자열 그대로
+  location: string;
+  imageUrl: string | null;     // NULL 가능 — placeholder 처리 필수
+  isFostered: boolean;
+  likeCount: number;
+  isLiked: boolean;            // 로그인 회원이 좋아요한 동물인지(비로그인이면 false)
+}
+
+/**
+ * 상세 페이지.
+ * 백엔드: animal/dto/response/AnimalDetailPageResponse.java 와 1:1.
+ */
+export interface AnimalDetail {
+  animalId: number;
+  kind: AnimalKindCode;
+  nickname: string;
+  gender: AnimalGenderCode;
+  typeName: string;
+  age: string;
+  location: string;
+  weight: string;              // 공공API 원본 문자열
+  color: string;
+  specialMark: string;
+  vaccinationChk: string;
+  imageUrl: string | null;
+  isFostered: boolean;
+  likeCount: number;
+  isLiked: boolean;
+}
+
+/**
+ * 목록 동적 검색 필터.
+ * 백엔드: GET /api/animals/list 의 쿼리 파라미터(kind/location/isFostered/isLiked/gender)와 대응.
+ * 미지정(undefined) = 필터 미적용. queryKey 안정성을 위해 값이 있는 것만 채운다.
+ */
+export interface AnimalFilters {
+  kind?: AnimalKindCode;
+  gender?: AnimalGenderCode;
+  location?: string;
+  isFostered?: boolean;
+  isLiked?: boolean;
 }

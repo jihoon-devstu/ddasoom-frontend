@@ -29,6 +29,7 @@ export function LoginPage() {
   const LOGIN_ERROR_MESSAGES: Record<string, string> = {
       AUTH_106: '이미 해당 이메일로 가입된 계정이 있어요. 아래에서 이메일 로그인으로 이용해 주세요.',
       AUTH_107: '소셜 계정의 이메일 제공에 동의해 주세요.',
+      AUTH_109: '탈퇴 처리된 계정이에요. 계정 복구를 원하시면 1:1 문의를 이용해 주세요.',
     };
     const errorCode = searchParams.get('error');
     const externalError = errorCode
@@ -45,6 +46,7 @@ export function LoginPage() {
     try {
       const result = await login(form);
       setAuth(result.accessToken, toAuthUser(result));
+      console.log(result.accessToken);
       toast.success(`${result.nickname ?? '회원'}님, 환영합니다!`);
       // GUEST(소셜 가입 미완료)가 일반 로그인할 일은 없지만(password null) 방어적으로 홈으로 통일
       navigate('/');
