@@ -5,6 +5,10 @@ export type FosterStatus =
   | 'EXTENDED'
   | 'ENDED';
 
+export interface FosterPendingApplication {
+  hasPendingApplication: boolean;
+}
+
 export interface FosterUserListItem {
   fosterId: number;
   animalId: number;
