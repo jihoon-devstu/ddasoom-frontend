@@ -5,6 +5,7 @@ import {
   getAdminPosts,
   getAdminPostDetail,
   getAdminPostComments,
+  getAdminComments,
   forceDeletePost,
   forceDeleteComment,
   type AdminPostSearchParams,
@@ -61,6 +62,41 @@ export function useForceDeleteComment(postId: number) {
   return useMutation({
     mutationFn: (commentId: number) => forceDeleteComment(postId, commentId),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.posts() });
+      toast.success('댓글을 강제삭제했습니다.');
+    },
+  });
+}
+
+// ===== 전체 댓글 관리 (게시글에 종속되지 않은 사이트 전체 댓글 목록) =====
+
+/**
+ * 전체 댓글 목록 — 전체 1회 로드 후 검색/필터/정렬/페이징은 페이지에서 클라이언트 처리(AdminPosts와 동일).
+ */
+export function useAdminComments(page = 0, size = 500) {
+  return useQuery({
+    queryKey: queryKeys.admin.commentList({ page, size }),
+    queryFn: () => getAdminComments(page, size),
+  });
+}
+
+/**
+ * 전체 댓글 관리 화면의 댓글 강제삭제.
+ * 목록 자체(comments())와, 원글의 commentCount·상세가 걸린 posts()를 함께 무효화한다.
+ * postId는 목록 행이 함께 내려주므로 기존 DELETE /api/admin/posts/{postId}/comments/{commentId} 재사용.
+ */
+export function useForceDeleteCommentInList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+    }: {
+      postId: number;
+      commentId: number;
+    }) => forceDeleteComment(postId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.comments() });
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.posts() });
       toast.success('댓글을 강제삭제했습니다.');
     },

@@ -56,6 +56,21 @@ export interface AdminCommentItem {
   deletedAt: string | null; // null = 활성, 값 있음 = 삭제됨
 }
 
+// 응답: board/dto/response/AdminAllCommentResponse.java — 전체 댓글 관리 행 (삭제 댓글 포함)
+// ⚠️ 게시글 상세 안 댓글(AdminCommentItem)과 달리 원글 컨텍스트(postId/postTitle/boardType) 포함 —
+//    어느 글의 댓글인지 표시하고, 행에서 원글 상세(/admin/posts/{postId})로 이동하기 위함.
+export interface AdminGlobalCommentItem {
+  commentId: number;
+  author: Author;
+  content: string;
+  postId: number;
+  postTitle: string;
+  boardType: string; // DOG_INFO / CAT_INFO / ADOPTION_REVIEW
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null; // null = 활성, 값 있음 = 삭제됨
+}
+
 // 목록 조회 쿼리 파라미터
 export interface AdminPostSearchParams {
   boardType?: string; // 선택 필터 (미전달 = 전 보드)
@@ -107,6 +122,21 @@ export async function getAdminPostComments(
     ApiResponse<PageResponse<AdminCommentItem>>
   >(`/admin/posts/${postId}/comments`, { params: { page, size } });
   return res.data.data as PageResponse<AdminCommentItem>;
+}
+
+/**
+ * 전체 댓글 목록 — 백엔드: GET /api/admin/comments
+ * 특정 게시글이 아닌 사이트 전체 댓글(삭제 포함, 최신순). 원글 컨텍스트 포함.
+ * 검색/게시판 필터/정렬은 프론트에서 처리하므로 전체 1회 로드(size 크게) 후 클라이언트 필터링.
+ */
+export async function getAdminComments(
+  page = 0,
+  size = 500,
+): Promise<PageResponse<AdminGlobalCommentItem>> {
+  const res = await axiosInstance.get<
+    ApiResponse<PageResponse<AdminGlobalCommentItem>>
+  >('/admin/comments', { params: { page, size } });
+  return res.data.data as PageResponse<AdminGlobalCommentItem>;
 }
 
 /**
