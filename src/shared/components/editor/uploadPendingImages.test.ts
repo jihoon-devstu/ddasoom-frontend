@@ -49,13 +49,24 @@ beforeEach(() => {
 describe('uploadPendingImages', () => {
   it('전체 성공 시 HTML에 blob:/data-local-id가 남지 않는다', async () => {
     uploadImageMock
-      .mockResolvedValueOnce({ imageId: 100, url: 'https://cdn/1.png', isThumbnail: true })
-      .mockResolvedValueOnce({ imageId: 200, url: 'https://cdn/2.png', isThumbnail: false });
+      .mockResolvedValueOnce({
+        imageId: 100,
+        url: 'https://cdn/1.png',
+        isThumbnail: true,
+      })
+      .mockResolvedValueOnce({
+        imageId: 200,
+        url: 'https://cdn/2.png',
+        isThumbnail: false,
+      });
 
     const editor = makeEditorWithTwoBlobs();
     const used = await uploadPendingImages(editor, 'NOTICE');
 
-    expect(used).toEqual(['local-1', 'local-2']);
+    expect(used).toEqual([
+      { localId: 'local-1', imageId: 100 },
+      { localId: 'local-2', imageId: 200 },
+    ]);
     const html = editor.getHTML();
     expect(html).not.toContain('blob:');
     expect(html).not.toContain('data-local-id');
@@ -66,12 +77,18 @@ describe('uploadPendingImages', () => {
 
   it('부분 실패 시 성공분 attrs는 갱신하고 reject한다', async () => {
     uploadImageMock
-      .mockResolvedValueOnce({ imageId: 100, url: 'https://cdn/1.png', isThumbnail: true })
+      .mockResolvedValueOnce({
+        imageId: 100,
+        url: 'https://cdn/1.png',
+        isThumbnail: true,
+      })
       .mockRejectedValueOnce(new Error('network down'));
 
     const editor = makeEditorWithTwoBlobs();
 
-    await expect(uploadPendingImages(editor, 'NOTICE')).rejects.toThrow(/2번째 업로드 실패/);
+    await expect(uploadPendingImages(editor, 'NOTICE')).rejects.toThrow(
+      /2번째 업로드 실패/,
+    );
 
     const html = editor.getHTML();
     // 1번째: 성공 → 확정 URL + imageId, local-id 제거

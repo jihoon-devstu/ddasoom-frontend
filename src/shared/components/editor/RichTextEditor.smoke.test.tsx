@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { createRef } from 'react';
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { RichTextEditor, type RichTextEditorHandle } from './RichTextEditor';
 
 // 확장 배선(StarterKit link 설정 + DeferredImage + Placeholder)과 툴바(useEditorState)가
@@ -12,9 +12,9 @@ describe('RichTextEditor 마운트', () => {
     render(
       <RichTextEditor
         ref={ref}
-        ownerType="NOTICE"
-        initialHtml="<p>공지 본문</p>"
-        placeholder="내용을 입력하세요"
+        ownerType='NOTICE'
+        initialHtml='<p>공지 본문</p>'
+        placeholder='내용을 입력하세요'
       />,
     );
 
@@ -27,5 +27,21 @@ describe('RichTextEditor 마운트', () => {
     // ref 핸들 노출 확인
     expect(typeof ref.current?.getPayload).toBe('function');
     expect(typeof ref.current?.cleanup).toBe('function');
+  });
+
+  it('초기 본문의 이미지 목록을 onImagesChange로 통지한다', async () => {
+    const onImagesChange = vi.fn();
+    render(
+      <RichTextEditor
+        ownerType='POST'
+        initialHtml='<p>본문</p><img src="https://cdn/a.png" data-image-id="5">'
+        onImagesChange={onImagesChange}
+      />,
+    );
+
+    await waitFor(() => expect(onImagesChange).toHaveBeenCalledTimes(1));
+    expect(onImagesChange.mock.calls[0][0]).toEqual([
+      { key: 'id:5', src: 'https://cdn/a.png', imageId: 5, localId: null },
+    ]);
   });
 });
