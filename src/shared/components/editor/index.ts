@@ -2,4 +2,5 @@
 export { RichTextEditor } from './RichTextEditor';
 export type { RichTextEditorHandle, EditorPayload } from './RichTextEditor';
 export { SafeHtmlViewer } from './SafeHtmlViewer';
+export { toImageKey, type EditorImage } from './extractEditorImages';
 export { EDITOR_OWNER_TYPE, type OwnerType } from './editorConstants';
