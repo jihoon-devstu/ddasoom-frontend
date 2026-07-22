@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { CalendarDays } from 'lucide-react';
 import { SortableHeader } from '@/features/admin/components/SortableHeader';
-import { useAdminFosters } from '@/features/foster/hooks/useAdminFosters';
+import { useAdminFosters } from '@/features/admin/hooks/useAdminFosters';
 import type {
   FosterAdminListItem,
   FosterManagementScope,

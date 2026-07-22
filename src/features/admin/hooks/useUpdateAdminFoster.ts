@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { updateAdminFoster } from '@/features/foster/api/fosterAdminApi';
+import { updateAdminFoster } from '@/features/admin/api/adminFosterApi';
 import type { FosterAdminUpdatePayload } from '@/features/foster/types';
 import { queryKeys } from '@/shared/api/queryKeys';
 

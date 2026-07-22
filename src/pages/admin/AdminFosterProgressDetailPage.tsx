@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, PawPrint } from 'lucide-react';
-import { useAdminFosterDetail } from '@/features/foster/hooks/useAdminFosterDetail';
-import { useDeleteAdminFoster } from '@/features/foster/hooks/useDeleteAdminFoster';
+import { useAdminFosterDetail } from '@/features/admin/hooks/useAdminFosterDetail';
+import { useDeleteAdminFoster } from '@/features/admin/hooks/useDeleteAdminFoster';
 import { FosterStatusBadge } from '@/features/foster/components/FosterStatusBadge';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
