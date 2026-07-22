@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { UserLayout } from '@/shared/layouts/UserLayout';
 import { AdminLayout } from '@/shared/layouts/AdminLayout';
@@ -24,7 +24,6 @@ import { LikedAnimalsTab } from '@/pages/mypage/LikedAnimalsTab';
 import { FosterHistoryTab } from '@/pages/mypage/FosterHistoryTab';
 import { MyPostsTab } from '@/pages/mypage/MyPostsTab';
 import { MyCommentsTab } from '@/pages/mypage/MyCommentsTab';
-import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminNoticeListPage } from '@/pages/admin/AdminNoticeListPage';
 import { AdminNoticeFormPage } from '@/pages/admin/AdminNoticeFormPage';
@@ -117,11 +116,14 @@ export const router = createBrowserRouter([
         ],
       },
       { path: '*', element: <NotFoundPage /> },
-      { path: 'forbidden', element: <ForbiddenPage /> }, // 403 리다이렉트
+      { path: 'forbidden', element: <ForbiddenPage /> }, // 403 리다이렉트 (인터셉터가 강제 이동)
+      // ⚠️ catch-all은 항상 맨 마지막 — 위 정적 경로들보다 뒤에 와야 한다.
+      //    (v7 라우트 랭킹 덕에 순서가 어긋나도 당장은 동작하지만, 그 우연에 기대지 않는다)
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
-  // 관리자 로그인은 공개(가드/AdminLayout 밖)
-  { path: '/admin/login', element: <AdminLoginPage /> },
+  // 로그인 경로는 /login으로 통일 — 과거 /admin/login 접근은 /login으로 리다이렉트
+  { path: '/admin/login', element: <Navigate to="/login" replace /> },
   {
     // 관리자 영역: ADMIN 가드 → AdminLayout
     path: '/admin',

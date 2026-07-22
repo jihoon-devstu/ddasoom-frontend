@@ -26,15 +26,19 @@ export function LoginPage() {
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 소셜 콜백이 ?error=코드로 넘겨주는 차단성 에러 → 로그인 화면 배너 문구.
+  // 매 렌더 재생성될 이유가 없는 상수라 컴포넌트 밖에 둔다.
   const LOGIN_ERROR_MESSAGES: Record<string, string> = {
-      AUTH_106: '이미 해당 이메일로 가입된 계정이 있어요. 아래에서 이메일 로그인으로 이용해 주세요.',
-      AUTH_107: '소셜 계정의 이메일 제공에 동의해 주세요.',
-      AUTH_109: '탈퇴 처리된 계정이에요. 계정 복구를 원하시면 1:1 문의를 이용해 주세요.',
-    };
-    const errorCode = searchParams.get('error');
-    const externalError = errorCode
-      ? (LOGIN_ERROR_MESSAGES[errorCode] ?? '소셜 로그인에 실패했습니다. 다시 시도해 주세요.')
-      : undefined;  
+    AUTH_106: '이미 해당 이메일로 가입된 계정이 있어요. 아래에서 이메일 로그인으로 이용해 주세요.',
+    AUTH_107: '소셜 계정의 이메일 제공에 동의해 주세요.',
+    AUTH_109: '탈퇴 처리된 계정이에요. 계정 복구를 원하시면 1:1 문의를 이용해 주세요.',
+    AUTH_110: '이용이 제한된 계정이에요. 자세한 사항은 1:1 문의를 이용해 주세요.',
+  };
+  const DEFAULT_LOGIN_ERROR = '소셜 로그인에 실패했습니다. 다시 시도해 주세요.';
+  const errorCode = searchParams.get('error');
+  const externalError = errorCode
+    ? (LOGIN_ERROR_MESSAGES[errorCode] ?? DEFAULT_LOGIN_ERROR)
+    : undefined;
 
   const {
     register, handleSubmit, setError,
@@ -46,10 +50,9 @@ export function LoginPage() {
     try {
       const result = await login(form);
       setAuth(result.accessToken, toAuthUser(result));
-      console.log(result.accessToken);
       toast.success(`${result.nickname ?? '회원'}님, 환영합니다!`);
-      // GUEST(소셜 가입 미완료)가 일반 로그인할 일은 없지만(password null) 방어적으로 홈으로 통일
-      navigate('/');
+      // ADMIN은 관리자 영역으로, 그 외(GUEST 포함)는 홈으로 통일
+      navigate(result.role === 'ADMIN' ? '/admin' : '/');
     } catch (error) {
       // 백엔드 로그인 응답(C안):
       //  - AUTH_101(401): 계정없음/비번틀림/소셜전용 — 사유 미구분 (열거 공격 방지)
