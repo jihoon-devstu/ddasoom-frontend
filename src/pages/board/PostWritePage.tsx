@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 
 import {
   RichTextEditor,
+  toImageKey,
+  type EditorImage,
   type RichTextEditorHandle,
 } from '@/shared/components/editor';
 import { Button } from '@/shared/components/ui/button';
@@ -20,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
+import { ThumbnailSelector } from '@/features/board/components/ThumbnailSelector';
 import { useCreatePost } from '@/features/board/hooks/useCreatePost';
 import { useUpdatePost } from '@/features/board/hooks/useUpdatePost';
 import { usePostDetailQuery } from '@/features/board/hooks/usePostDetailQuery';
@@ -62,6 +65,18 @@ export function PostWritePage() {
   // 이미지 업로드(getPayload) 구간은 mutation 밖이라 isPending 으로 안 잡힘 → 별도 상태로 전체를 덮는다.
   const [isSaving, setIsSaving] = useState(false);
 
+  // 대표 이미지 선택 — 에디터가 본문 이미지 목록을 통지하고, 사용자가 그중 하나를 고른다.
+  // 신규 이미지는 저장 시점까지 imageId가 없으므로 선택은 EditorImage.key(=imageId 또는 localId)로 보관하고,
+  // 저장 시 getPayload().imageIdByKey 로 확정 imageId를 되찾는다.
+  const [editorImages, setEditorImages] = useState<EditorImage[]>([]);
+  const [thumbnailKey, setThumbnailKey] = useState<string | null>(null);
+
+  // 무선택이거나 고른 이미지가 본문에서 삭제된 경우 → 첫 이미지가 기본 대표 이미지(기존 동작 유지).
+  const effectiveThumbnailKey =
+    editorImages.find((image) => image.key === thumbnailKey)?.key ??
+    editorImages[0]?.key ??
+    null;
+
   const {
     register,
     handleSubmit,
@@ -79,6 +94,16 @@ export function PostWritePage() {
       reset({ category: post.category, title: post.title });
     }
   }, [isEdit, post, reset]);
+
+  // 수정 모드 — 서버가 지정해 둔 대표 이미지를 최초 1회만 preselect.
+  // (상세 재조회로 post 객체가 갱신돼도 사용자의 선택을 덮지 않도록 ref로 가드)
+  const thumbnailInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!isEdit || !post || thumbnailInitializedRef.current) return;
+    thumbnailInitializedRef.current = true;
+    const current = post.images.find((image) => image.isThumbnail);
+    if (current) setThumbnailKey(toImageKey(current.imageId));
+  }, [isEdit, post]);
 
   // 수정 모드 가드 — 실검증(403 BOARD_002)은 백엔드 몫, 여기선 UX용 선차단.
   // URL slug의 게시판과 실제 게시글 boardType이 다르면(잘못된 경로) 목록으로 돌려보낸다.
@@ -127,15 +152,22 @@ export function PostWritePage() {
       }
 
       // 3) 게시글 저장. 성공 토스트/캐시 무효화는 각 mutation 훅의 onSuccess 가 담당.
-      //    대표 이미지 정책: 본문 첫 이미지 = 썸네일 (작성과 동일 규칙 — 명시 선택 UI 도입 전까지 유지).
+      //    대표 이미지 정책: 사용자가 고른 이미지, 무선택이면 본문 첫 이미지(ThumbnailSelector 기본값).
       //    수정 시 imageIds 는 "최종" 목록 — 빠진 기존 이미지는 백엔드 syncImages 가 soft delete.
+      const thumbnailImageId =
+        (effectiveThumbnailKey != null
+          ? payload.imageIdByKey[effectiveThumbnailKey]
+          : undefined) ??
+        payload.imageIds[0] ??
+        null;
+
       const body = {
         boardType: board.boardType,
         category: form.category,
         title: form.title,
         content: payload.html,
         imageIds: payload.imageIds,
-        thumbnailImageId: payload.imageIds[0] ?? null,
+        thumbnailImageId,
       };
       let savedPostId: number;
       try {
@@ -233,8 +265,15 @@ export function PostWritePage() {
             ownerType='POST'
             initialHtml={isEdit && post ? post.content : ''}
             placeholder='내용을 입력해주세요'
+            onImagesChange={setEditorImages}
           />
         </div>
+
+        <ThumbnailSelector
+          images={editorImages}
+          selectedKey={effectiveThumbnailKey}
+          onSelect={setThumbnailKey}
+        />
 
         <div className='flex gap-2'>
           <Button type='submit' disabled={isSaving}>
