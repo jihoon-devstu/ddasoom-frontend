@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { isAxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { CircleAlert } from 'lucide-react';
-import { useUpdateAdminFoster } from '@/features/foster/hooks/useUpdateAdminFoster';
+import { useUpdateAdminFoster } from '@/features/admin/hooks/useUpdateAdminFoster';
 import type {
   FosterAdminDetail,
   FosterAdminUpdatePayload,

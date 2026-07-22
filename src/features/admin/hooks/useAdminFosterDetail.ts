@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAdminFosterDetail } from '@/features/foster/api/fosterAdminApi';
+import { getAdminFosterDetail } from '@/features/admin/api/adminFosterApi';
 import { queryKeys } from '@/shared/api/queryKeys';
 
 export function useAdminFosterDetail(fosterId: number | null) {

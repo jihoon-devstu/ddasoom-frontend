@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { HandHeart } from 'lucide-react';
-import { useAdminFosterDetail } from '@/features/foster/hooks/useAdminFosterDetail';
-import { AdminFosterEditForm } from '@/features/foster/components/AdminFosterEditForm';
+import { useAdminFosterDetail } from '@/features/admin/hooks/useAdminFosterDetail';
+import { AdminFosterEditForm } from '@/features/admin/components/AdminFosterEditForm';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
