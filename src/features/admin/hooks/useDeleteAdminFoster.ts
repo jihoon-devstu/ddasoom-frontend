@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { deleteAdminFoster } from '@/features/foster/api/fosterAdminApi';
+import { deleteAdminFoster } from '@/features/admin/api/adminFosterApi';
 import { queryKeys } from '@/shared/api/queryKeys';
 
 export function useDeleteAdminFoster() {

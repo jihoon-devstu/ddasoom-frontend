@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAdminFosters } from '@/features/foster/api/fosterAdminApi';
+import { getAdminFosters } from '@/features/admin/api/adminFosterApi';
 import type { FosterAdminListParams } from '@/features/foster/types';
 import { queryKeys } from '@/shared/api/queryKeys';
 
